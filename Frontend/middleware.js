@@ -13,7 +13,8 @@ import { ROUTE_ROLE_MAP, LOGIN_ROUTE, UNAUTHORIZED_ROUTE } from "./src/constants
  * If refreshToken is gone or expired, the session cannot be recovered.
  */ 
 
-const PUBLIC_PATHS = ["/login", "/unauthorized", "/_next", "/favicon.ico", "/api"];
+// Add "/" to this array
+const PUBLIC_PATHS = ["/", "/login", "/unauthorized", "/_next", "/favicon.ico", "/api"];
 
 function decodeJWTPayload(token) {
   try {
@@ -34,9 +35,16 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   // -------------------------------- Skip public paths --------------------------------
-  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
+  // if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
+  //   return NextResponse.next();
+  // }
+
+  const isPublicPath = PUBLIC_PATHS.some((path) => path === "/" ? pathname === "/" : pathname.startsWith(path));
+
+  if (isPublicPath) {
     return NextResponse.next();
   }
+
 
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
