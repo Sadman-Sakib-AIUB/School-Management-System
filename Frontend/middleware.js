@@ -14,7 +14,15 @@ import { ROUTE_ROLE_MAP, LOGIN_ROUTE, UNAUTHORIZED_ROUTE } from "./src/constants
  */ 
 
 // Add "/" to this array
-const PUBLIC_PATHS = ["/", "/login", "/unauthorized", "/_next", "/favicon.ico", "/api", "/notice"];
+// const PUBLIC_PATHS = ["/", "/login", "/unauthorized", "/_next", "/favicon.ico", "/api", "/notice"];
+
+// 1. Remove "/" from this array
+const PUBLIC_PREFIXES = ["/login", "/unauthorized", "/_next", "/favicon.ico", "/api", "/notice"];
+
+export function middleware(request) {
+  const { pathname } = request.nextUrl;
+
+  
 
 function decodeJWTPayload(token) {
   try {
@@ -39,16 +47,17 @@ export function middleware(request) {
   //   return NextResponse.next();
   // }
 
-  const isPublicPath = PUBLIC_PATHS.some((path) => {
-  // If the path in the array is just "/", check for an exact match
-  if (path === "/") return pathname === "/";
-  // Otherwise, check if the current URL starts with the public path (like /login or /notice)
-  return pathname.startsWith(path);
-});
+  // Exact match for the landing page
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
 
-if (isPublicPath) {
-  return NextResponse.next();
-}
+  // Prefix match for other public assets/routes (like /notice/:id)
+  if (PUBLIC_PREFIXES.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
+
+  // -----------------------------
 
 
   const accessToken = request.cookies.get("accessToken")?.value;
