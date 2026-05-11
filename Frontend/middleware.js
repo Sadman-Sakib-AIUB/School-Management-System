@@ -14,7 +14,7 @@ import { ROUTE_ROLE_MAP, LOGIN_ROUTE, UNAUTHORIZED_ROUTE } from "./src/constants
  */ 
 
 // Add "/" to this array
-const PUBLIC_PATHS = ["/", "/login", "/unauthorized", "/_next", "/favicon.ico", "/api"];
+const PUBLIC_PATHS = ["/", "/login", "/unauthorized", "/_next", "/favicon.ico", "/api", "/notice"];
 
 function decodeJWTPayload(token) {
   try {
@@ -38,12 +38,6 @@ export function middleware(request) {
   if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
   }
-
-  // const isPublicPath = PUBLIC_PATHS.some((path) => path === "/" ? pathname === "/" : pathname.startsWith(path));
-
-  // if (isPublicPath) {
-  //   return NextResponse.next();
-  // }
 
 
   const accessToken = request.cookies.get("accessToken")?.value;
