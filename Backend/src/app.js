@@ -10,6 +10,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Required for Railway/Render — trust proxy headers
+app.set('trust proxy', 1)
+
 const corsOptions = {
   origin: 'http://localhost:3000', 
   credentials: true,
