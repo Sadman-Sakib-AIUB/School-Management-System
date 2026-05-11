@@ -96,19 +96,33 @@
 
 
 
+
 import { NextResponse } from "next/server";
-import { ROUTE_ROLE_MAP, LOGIN_ROUTE, UNAUTHORIZED_ROUTE } from "./src/constants/routes";
+import {
+  ROUTE_ROLE_MAP,
+  LOGIN_ROUTE,
+  UNAUTHORIZED_ROUTE,
+} from "./src/constants/routes";
 
-// 1. Routes that are EXACTLY these strings (Home, About, Contact)
-const PUBLIC_EXACT = ["/", "/about", "/contact", "/unauthorized", "/login"];
-
-// 2. Routes where anything inside the folder is public (Dynamic Routes, APIs)
-const PUBLIC_PREFIXES = ["/notice/", "/api/", "/_next/", "/favicon.ico"];
+const PROTECTED_PATHS = [
+  "/dashboard",
+  "/admin",
+   "/teacher",
+   "/student",
+   "/parent",
+   "/principal",
+  "/profile",
+  "/settings",
+];
 
 function decodeJWTPayload(token) {
   try {
     const base64Payload = token.split(".")[1];
-    const decoded = atob(base64Payload.replace(/-/g, "+").replace(/_/g, "/"));
+
+    const decoded = atob(
+      base64Payload.replace(/-/g, "+").replace(/_/g, "/")
+    );
+
     return JSON.parse(decoded);
   } catch {
     return null;
@@ -117,68 +131,91 @@ function decodeJWTPayload(token) {
 
 function isTokenExpired(payload) {
   if (!payload?.exp) return true;
+
   return payload.exp * 1000 < Date.now();
 }
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // ------------------- 1. ALLOW PUBLIC PAGES -------------------
-  
-  // Check for exact public matches
-  if (PUBLIC_EXACT.includes(pathname)) {
+  // ---------------- Skip Non Protected Routes ----------------
+  const isProtectedRoute = PROTECTED_PATHS.some((path) =>
+    pathname.startsWith(path)
+  );
+
+  if (
+    !isProtectedRoute ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname === "/favicon.ico"
+  ) {
     return NextResponse.next();
   }
 
-  // Check for public prefixes (covers /notice/123, /notice/abc)
-  if (PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
-    return NextResponse.next();
-  }
-
-  // ------------------- 2. AUTHENTICATION LOGIC -------------------
-  
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
 
+  // ---------------- No Tokens ----------------
   if (!accessToken && !refreshToken) {
     const loginUrl = new URL(LOGIN_ROUTE, request.url);
+
     loginUrl.searchParams.set("callbackUrl", pathname);
+
     return NextResponse.redirect(loginUrl);
   }
 
-  const refreshPayload = refreshToken ? decodeJWTPayload(refreshToken) : null;
-  const isSessionDead = !refreshToken || !refreshPayload || isTokenExpired(refreshPayload);
+  // ---------------- Session Check ----------------
+  const refreshPayload = refreshToken
+    ? decodeJWTPayload(refreshToken)
+    : null;
+
+  const isSessionDead =
+    !refreshToken ||
+    !refreshPayload ||
+    isTokenExpired(refreshPayload);
 
   if (isSessionDead) {
-    const response = NextResponse.redirect(new URL(LOGIN_ROUTE, request.url));
+    const response = NextResponse.redirect(
+      new URL(LOGIN_ROUTE, request.url)
+    );
+
     response.cookies.delete("accessToken");
     response.cookies.delete("refreshToken");
+
     return response;
   }
 
-  const accessPayload = accessToken ? decodeJWTPayload(accessToken) : null;
+  // ---------------- Role Check ----------------
+  const accessPayload = accessToken
+    ? decodeJWTPayload(accessToken)
+    : null;
+
   const userRoles = accessPayload?.roles || [];
 
-  // ------------------- 3. ROLE PROTECTION -------------------
-  
-  const matchedRoute = Object.keys(ROUTE_ROLE_MAP).find((route) =>
-    pathname.startsWith(route)
-  );
+  if (userRoles.length > 0) {
+    const matchedRoute = Object.keys(ROUTE_ROLE_MAP).find((route) =>
+      pathname.startsWith(route)
+    );
 
-  if (matchedRoute) {
-    const allowedRoles = ROUTE_ROLE_MAP[matchedRoute];
-    const hasAccess = userRoles.some((role) => allowedRoles.includes(role));
-    if (!hasAccess) {
-      return NextResponse.redirect(new URL(UNAUTHORIZED_ROUTE, request.url));
+    if (matchedRoute) {
+      const allowedRoles = ROUTE_ROLE_MAP[matchedRoute];
+
+      const hasAccess = userRoles.some((role) =>
+        allowedRoles.includes(role)
+      );
+
+      if (!hasAccess) {
+        return NextResponse.redirect(
+          new URL(UNAUTHORIZED_ROUTE, request.url)
+        );
+      }
     }
   }
 
   return NextResponse.next();
 }
 
-// Ensure the matcher doesn't interfere with static assets
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
+
