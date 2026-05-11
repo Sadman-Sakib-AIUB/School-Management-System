@@ -35,15 +35,15 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   // -------------------------------- Skip public paths --------------------------------
-  // if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
-  //   return NextResponse.next();
-  // }
-
-  const isPublicPath = PUBLIC_PATHS.some((path) => path === "/" ? pathname === "/" : pathname.startsWith(path));
-
-  if (isPublicPath) {
+  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
   }
+
+  // const isPublicPath = PUBLIC_PATHS.some((path) => path === "/" ? pathname === "/" : pathname.startsWith(path));
+
+  // if (isPublicPath) {
+  //   return NextResponse.next();
+  // }
 
 
   const accessToken = request.cookies.get("accessToken")?.value;
