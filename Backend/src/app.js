@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set('trust proxy', 1)
 
 const corsOptions = {
-  origin: 'http://localhost:3000', 
+  origin: 'https://school-management-system-a.vercel.app', 
   credentials: true,
   optionsSuccessStatus: 200 
 };
