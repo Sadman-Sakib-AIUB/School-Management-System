@@ -35,9 +35,20 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   // -------------------------------- Skip public paths --------------------------------
-  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
+  // if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
+  //   return NextResponse.next();
+  // }
+
+  const isPublicPath = PUBLIC_PATHS.some((path) => {
+  // If the path in the array is just "/", check for an exact match
+  if (path === "/") return pathname === "/";
+  // Otherwise, check if the current URL starts with the public path (like /login or /notice)
+  return pathname.startsWith(path);
+});
+
+if (isPublicPath) {
+  return NextResponse.next();
+}
 
 
   const accessToken = request.cookies.get("accessToken")?.value;
