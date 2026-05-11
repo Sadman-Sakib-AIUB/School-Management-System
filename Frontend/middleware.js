@@ -18,11 +18,7 @@ import { ROUTE_ROLE_MAP, LOGIN_ROUTE, UNAUTHORIZED_ROUTE } from "./src/constants
 
 // 1. Remove "/" from this array
 const PUBLIC_PREFIXES = ["/login", "/unauthorized", "/_next", "/favicon.ico", "/api", "/notice"];
-
-export function middleware(request) {
-  const { pathname } = request.nextUrl;
-
-  
+   
 
 function decodeJWTPayload(token) {
   try {
