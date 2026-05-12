@@ -12,7 +12,7 @@ export const metadata = {
   title: "School Management System",
   description: "Developed by Sadman Sakib",
   icons: {
-    icon: "./favicon.svg", // Place the file in your /public folder
+    icon: "./favicon.png", // Place the file in your /public folder
     // apple: "/apple-touch-icon.png", // Optional for iOS
   },
 };
