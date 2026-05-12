@@ -5,7 +5,8 @@ import { NotepadText } from 'lucide-react';
 import Breadcrumb from '../../../components/Breadcrumb';
 
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 const Notice = async ({params}) => {
 
