@@ -9,8 +9,8 @@ const notoBengali = Noto_Sans_Bengali({
 });
 
 export const metadata = {
-  title: "Apar's School Management System",
-  description: "Developed by ASG SHOP",
+  title: "School Management System",
+  description: "Developed by Sadman Sakib",
   icons: {
     icon: "./favicon.svg", // Place the file in your /public folder
     // apple: "/apple-touch-icon.png", // Optional for iOS
