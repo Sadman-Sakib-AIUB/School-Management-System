@@ -169,7 +169,7 @@ const Login = () => {
             <ShieldCheck size={40} />
           </div> */}
           <Link href={"/"} className="text-4xl font-extrabold text-primary-900 tracking-tight mb-2">
-            অপার্স স্কুল পোর্টাল
+            স্কুল পোর্টাল
           </Link>
           <p className="text-primary-700 pt-2 font-medium">স্কুল ম্যানেজমেন্ট সিস্টেম</p>
         </div>
