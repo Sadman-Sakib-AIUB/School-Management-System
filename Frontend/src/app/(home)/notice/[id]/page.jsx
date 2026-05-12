@@ -6,7 +6,14 @@ import Breadcrumb from '../../../components/Breadcrumb';
 
 
 // export const dynamic = "force-dynamic";
-export const dynamicParams = true;
+// export const dynamicParams = true;
+
+// Add this export
+export async function generateStaticParams() {
+  return notices.map((notice) => ({
+    id: String(notice.id), // must be string
+  }));
+}
 
 const Notice = async ({params}) => {
 
@@ -27,7 +34,7 @@ const Notice = async ({params}) => {
   // console.log(notice);
 
   const notice = notices.find((n) => n.id === parseInt(id));
-  // if (!notice) notFound();
+  if (!notice) notFound();
   // console.log(notice);
 
   
