@@ -27,7 +27,7 @@ const Notice = async ({params}) => {
   // console.log(notice);
 
   const notice = notices.find((n) => n.id === parseInt(id));
-  if (!notice) notFound();
+  // if (!notice) notFound();
   // console.log(notice);
 
   
